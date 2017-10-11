@@ -62,7 +62,6 @@
             this.txtResultInfo.Location = new System.Drawing.Point(6, 146);
             this.txtResultInfo.Multiline = true;
             this.txtResultInfo.Name = "txtResultInfo";
-            this.txtResultInfo.ReadOnly = true;
             this.txtResultInfo.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtResultInfo.Size = new System.Drawing.Size(689, 208);
             this.txtResultInfo.TabIndex = 2;
@@ -87,9 +86,11 @@
             this.listCards.Name = "listCards";
             this.listCards.Size = new System.Drawing.Size(174, 90);
             this.listCards.TabIndex = 5;
+            this.listCards.SelectedIndexChanged += new System.EventHandler(this.listCards_SelectedIndexChanged);
             // 
             // cmdCopy
             // 
+            this.cmdCopy.Enabled = false;
             this.cmdCopy.Location = new System.Drawing.Point(364, 67);
             this.cmdCopy.Name = "cmdCopy";
             this.cmdCopy.Size = new System.Drawing.Size(75, 23);
@@ -121,7 +122,6 @@
             this.Controls.Add(this.OpenFolderDestDialog);
             this.Name = "MainForm";
             this.Text = "Foto Card Reader";
-            this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

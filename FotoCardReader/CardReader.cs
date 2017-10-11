@@ -54,7 +54,7 @@ namespace FotoCardReader
             return destFilePath;
         }
 
-        public void CopyFiles(string[] drives)
+        public void CopyFiles(string disc)
         {
             string[] allfiles;
             string msg = string.Empty;

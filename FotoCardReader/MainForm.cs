@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace FotoCardReader
@@ -15,10 +12,7 @@ namespace FotoCardReader
             InitializeComponent();
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            cmdCopy.Enabled = false;
-        }
+
 
 
         private void OpenFolderDestDialog_Click(object sender, EventArgs e)
@@ -29,8 +23,8 @@ namespace FotoCardReader
             {
                 txtDestinationFolder.Text = folderBrowserDlg.SelectedPath;
                 CardReader.setDestinationDir(folderBrowserDlg.SelectedPath);
-                cmdCopy.Enabled = true;
-                
+                checkEnableCopyBtn();
+
             }
         }
 
@@ -42,22 +36,41 @@ namespace FotoCardReader
             {
                 listCards.Items.Add(item, true);
             }
+            checkEnableCopyBtn();
+        }
 
+        private void listCards_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            checkEnableCopyBtn();
         }
 
         private void cmdCopy_Click(object sender, EventArgs e)
         {
-            string[] listDrive = listCards.CheckedItems;
+            var listDrive = listCards.CheckedItems;
 
-            foreach (string item in listDrive)
+            foreach (string disc in listDrive)
             {
-                txtResultInfo.AppendText(item + Environment.NewLine);
-                //CardReader.CopyFiles(item.);
+                //txtResultInfo.AppendText(item + Environment.NewLine);
+                CardReader.CopyFiles(disc);
             }
 
         }
 
 
+        private void checkEnableCopyBtn()
+        {
+            var listDrive = listCards.CheckedItems;
+
+            if (txtDestinationFolder.Text != string.Empty && listDrive.Count > 0)
+            {
+                cmdCopy.Enabled = true;
+            }
+            else
+            {
+                cmdCopy.Enabled = false;
+            }
+            
+        }
 
 
 
@@ -68,9 +81,10 @@ namespace FotoCardReader
 
 
 
-       // public void SetFileCounter(int currCount, int allFiles)
-       // {
-       //     lblFileCounter.Text = "Skopiowano " + currCount + " z " + allFiles + " plików";
-       // }
+
+        // public void SetFileCounter(int currCount, int allFiles)
+        // {
+        //     lblFileCounter.Text = "Skopiowano " + currCount + " z " + allFiles + " plików";
+        // }
     }
 }
