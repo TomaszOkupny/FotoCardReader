@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace FotoCardReader
@@ -47,15 +49,38 @@ namespace FotoCardReader
         private void cmdCopy_Click(object sender, EventArgs e)
         {
             var listDrive = listCards.CheckedItems;
+            var listFiles = new string[] { };
+            
 
-            foreach (string disc in listDrive)
+            foreach (string drive in listDrive)
             {
-                //txtResultInfo.AppendText(item + Environment.NewLine);
-                CardReader.CopyFiles(disc);
-            }
+                CardReader.setFileList(drive);
+                Thread t = new Thread(new ThreadStart(CopyAllFiles));
 
+                t.Start();
+
+                t.IsBackground = true;
+
+                
+
+            }
         }
 
+        private void CopyAllFiles()
+        {
+
+            var info = new string[] { };
+
+            //CardReader.setFileList(drive);
+                info = CardReader.CopyFiles();
+
+            /*
+                foreach (var item in info)
+                {
+                    txtResultInfo.AppendText(item + Environment.NewLine);
+                }
+            */
+        }
 
         private void checkEnableCopyBtn()
         {
@@ -71,14 +96,6 @@ namespace FotoCardReader
             }
             
         }
-
-
-
-
-
-
-
-
 
 
 

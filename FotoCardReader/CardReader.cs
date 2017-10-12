@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,6 +8,7 @@ namespace FotoCardReader
     class CardReader
     {
         protected string destinationDir {get;set;}
+        protected string[] fileList { get; set; }
 
         public CardReader()
         {
@@ -54,35 +56,48 @@ namespace FotoCardReader
             return destFilePath;
         }
 
-        public void CopyFiles(string disc)
+
+
+        public void setFileList(string srcDrive)
+        {
+            this.fileList = Directory.GetFiles(srcDrive, "*.cr2", SearchOption.AllDirectories);
+        }
+
+        public string[] getFileList()
+        {
+            return this.fileList;
+        }
+
+
+        public string[] CopyFiles()
         {
             string[] allfiles;
-            string msg = string.Empty;
+            List<string> msg = new List<string>();
 
-            foreach (var drive in drives)
+            allfiles = getFileList();
+            string destFilePath = string.Empty;
+
+            foreach (var file in allfiles)
             {
-                allfiles = Directory.GetFiles(drive, "*.cr2", SearchOption.AllDirectories);
-                string destFilePath = string.Empty;
+                FileInfo srcFileInfo = new FileInfo(file);
+                destFilePath = this.GetDestFilePath(srcFileInfo.Name);
 
+                
 
-                foreach (var file in allfiles)
+                try
                 {
-                    FileInfo srcFileInfo = new FileInfo(file);
-                    destFilePath = this.GetDestFilePath(srcFileInfo.Name);
+                    File.Copy(srcFileInfo.FullName, destFilePath);
+                    if(Path.GetFileName(destFilePath) != srcFileInfo.Name)
+                    msg.Add("Zmiana nazwy " + srcFileInfo.FullName + " na " + destFilePath);
 
-                    try
-                    {
-                        srcFileInfo.CopyTo(destFilePath);
-                    }
-                    catch (Exception ex)
-                    {
-
-                        msg = ex.Message + "  Błąd podczas kopiowania pliku " + srcFileInfo.FullName;
-                       // MainForm.txtResultInfo.AppendText(msg + Environment.NewLine);
-                    }
-
+                    msg.Add("kopia " + srcFileInfo.FullName + " na " + destFilePath);
+                }
+                catch (Exception ex)
+                {
+                    msg.Add(ex.Message + "  Błąd podczas kopiowania pliku " + srcFileInfo.FullName);
                 }
             }
+            return msg.ToArray();
         }
 
 
