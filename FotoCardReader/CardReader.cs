@@ -10,7 +10,9 @@ namespace FotoCardReader
         protected string destinationDir {get;set;}
         protected string[] fileList { get; set; }
 
-        public CardReader()
+        
+
+        public CardReader(object frm)
         {
 
         }
@@ -24,7 +26,6 @@ namespace FotoCardReader
         {
             this.destinationDir = destinationDir;
         }
-
 
         public string[] ListDrive()
         {
@@ -56,8 +57,6 @@ namespace FotoCardReader
             return destFilePath;
         }
 
-
-
         public void setFileList(string srcDrive)
         {
             this.fileList = Directory.GetFiles(srcDrive, "*.cr2", SearchOption.AllDirectories);
@@ -73,16 +72,14 @@ namespace FotoCardReader
         {
             string[] allfiles;
             List<string> msg = new List<string>();
-
             allfiles = getFileList();
             string destFilePath = string.Empty;
 
+            int i = 1;
             foreach (var file in allfiles)
             {
                 FileInfo srcFileInfo = new FileInfo(file);
                 destFilePath = this.GetDestFilePath(srcFileInfo.Name);
-
-                
 
                 try
                 {
@@ -90,7 +87,10 @@ namespace FotoCardReader
                     if(Path.GetFileName(destFilePath) != srcFileInfo.Name)
                     msg.Add("Zmiana nazwy " + srcFileInfo.FullName + " na " + destFilePath);
 
-                    msg.Add("kopia " + srcFileInfo.FullName + " na " + destFilePath);
+                    //msg.Add("kopia " + srcFileInfo.FullName + " na " + destFilePath);
+
+                    //frm.SetFileCounter(i, allfiles.Length);
+                    i++;
                 }
                 catch (Exception ex)
                 {

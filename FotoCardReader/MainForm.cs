@@ -54,32 +54,36 @@ namespace FotoCardReader
 
             foreach (string drive in listDrive)
             {
-                CardReader.setFileList(drive);
-                Thread t = new Thread(new ThreadStart(CopyAllFiles));
-
-                t.Start();
-
-                t.IsBackground = true;
-
                 
-
+                Thread t = new Thread(new ParameterizedThreadStart(CopyAllFiles));
+                t.Start(drive);
+                t.IsBackground = true;
             }
         }
 
-        private void CopyAllFiles()
+        private void CopyAllFiles(object drive)
         {
-
             var info = new string[] { };
-
-            //CardReader.setFileList(drive);
+            CardReader.setFileList(drive.ToString());
                 info = CardReader.CopyFiles();
+           
 
-            /*
+
                 foreach (var item in info)
                 {
-                    txtResultInfo.AppendText(item + Environment.NewLine);
+                    if (txtResultInfo.InvokeRequired)
+                    {
+                        txtResultInfo.Invoke(new Action(delegate ()
+                        {
+                            txtResultInfo.AppendText(item + Environment.NewLine);
+                        }));
+                    }
+                    else
+                    {
+                        txtResultInfo.AppendText(item + Environment.NewLine);
+                    }  
                 }
-            */
+            
         }
 
         private void checkEnableCopyBtn()
@@ -99,9 +103,22 @@ namespace FotoCardReader
 
 
 
-        // public void SetFileCounter(int currCount, int allFiles)
-        // {
-        //     lblFileCounter.Text = "Skopiowano " + currCount + " z " + allFiles + " plików";
-        // }
+        public  void SetFileCounter(int currCount, int allFiles)
+         {
+
+            if (txtResultInfo.InvokeRequired)
+            {
+                txtResultInfo.Invoke(new Action(delegate ()
+                {
+                    lblFileCounter.Text = "Skopiowano " + currCount + " z " + allFiles + " plików";
+                }));
+            }
+            else
+            {
+                lblFileCounter.Text = "Skopiowano " + currCount + " z " + allFiles + " plików";
+            }
+
+            
+         }
     }
 }
