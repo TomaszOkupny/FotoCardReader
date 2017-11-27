@@ -5,46 +5,46 @@ using System.Linq;
 
 namespace FotoCardReader
 {
-    class CardReader
+    public class CardReader
     {
-        protected string destinationDir {get;set;}
-        protected string[] fileList { get; set; }
+        private string fileType = "*.cr2";
+        private string[] srcFileList, srcDirList;
 
-        
 
-        public CardReader(object frm)
+        public string SrcDir { get;}
+        public string DestDir { get;}
+        public int CopyProgress { get; private set; }
+        public int CurrFileNo { get; private set; }
+        public int ObjNo { get; set; }
+
+
+        public CardReader()
         {
-
         }
 
-        public string getDestinationDir()
+        public CardReader(string srcDir, string destDir)
         {
-            return this.destinationDir;
+            this.SrcDir = srcDir;
+            this.DestDir = destDir;
+            this.CopyProgress = 0;
+            this.CurrFileNo = 1;
+            SetSrcFileList();
         }
 
-        public void setDestinationDir(string destinationDir)
+        private void SetSrcFileList()
         {
-            this.destinationDir = destinationDir;
+            this.srcFileList = Directory.GetFiles(this.SrcDir, this.fileType, SearchOption.AllDirectories);
         }
 
-        public string[] ListDrive()
+        public string[] GetSrcFileList()
         {
-            var allDrives = DriveInfo.GetDrives().Where(drive => drive.IsReady && drive.DriveType == DriveType.Removable);
-
-            string[] result = new string[allDrives.Count()];
-            int i = 0;
-            foreach (DriveInfo d in allDrives)
-            {
-                result[i] = d.Name;
-                i++;
-            }
-            return result;
+            return this.srcFileList;
         }
 
-        public string GetDestFilePath(string fileName)
+        protected string GetDestFilePath(string fileName)
         {
-            string destDirPath = this.destinationDir + "\\";
-            string destFilePath = destDirPath + fileName;
+            string destDirPath = this.DestDir + "\\";
+            string destFilePath = destDirPath + Path.GetFileName(fileName);
 
             FileInfo destFileInfo = new FileInfo(destFilePath);
 
@@ -57,48 +57,58 @@ namespace FotoCardReader
             return destFilePath;
         }
 
-        public void setFileList(string srcDrive)
+        public void SetAllSrcDirList()
         {
-            this.fileList = Directory.GetFiles(srcDrive, "*.cr2", SearchOption.AllDirectories);
+            var allDrives = DriveInfo.GetDrives().Where(drive => drive.IsReady && drive.DriveType == DriveType.Removable);
+
+            string[] result = new string[allDrives.Count()];
+            int i = 0;
+            foreach (DriveInfo d in allDrives)
+            {
+                result[i] = d.Name;
+                i++;
+            }
+            this.srcDirList = result;
         }
 
-        public string[] getFileList()
+        public string[] GetSrcDirList()
         {
-            return this.fileList;
+            return this.srcDirList;
         }
 
-
-        public string[] CopyFiles()
+        public string CopyFile(string srcFile)
         {
-            string[] allfiles;
-            List<string> msg = new List<string>();
-            allfiles = getFileList();
+            string info = string.Empty;
             string destFilePath = string.Empty;
 
-            int i = 1;
-            foreach (var file in allfiles)
+            destFilePath = this.GetDestFilePath(srcFile);
+
+            
+            this.CopyProgress = (this.CurrFileNo * 100) / srcFileList.Length;
+
+
+            try
             {
-                FileInfo srcFileInfo = new FileInfo(file);
-                destFilePath = this.GetDestFilePath(srcFileInfo.Name);
+                File.Copy(srcFile, destFilePath);
+                if (Path.GetFileName(destFilePath) != srcFile)
+                    info = "Zmiana nazwy " + srcFile + " na " + destFilePath;
 
-                try
-                {
-                    File.Copy(srcFileInfo.FullName, destFilePath);
-                    if(Path.GetFileName(destFilePath) != srcFileInfo.Name)
-                    msg.Add("Zmiana nazwy " + srcFileInfo.FullName + " na " + destFilePath);
-
-                    //msg.Add("kopia " + srcFileInfo.FullName + " na " + destFilePath);
-
-                    //frm.SetFileCounter(i, allfiles.Length);
-                    i++;
-                }
-                catch (Exception ex)
-                {
-                    msg.Add(ex.Message + "  Błąd podczas kopiowania pliku " + srcFileInfo.FullName);
-                }
+                info = this.CurrFileNo + " z " + srcFileList.Length + " ("+ this.CopyProgress+"%) Skopiowano " + srcFile + " do " + destFilePath;
             }
-            return msg.ToArray();
+            catch (Exception ex)
+            {
+                info = ex.Message + "  Błąd podczas kopiowania pliku " + srcFile;
+            }
+
+            this.CurrFileNo++;
+
+            return info;
         }
+
+
+
+
+
 
 
     }//end class
