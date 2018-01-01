@@ -13,6 +13,12 @@ namespace FotoCardReader
         int mValX;
         int mValY;
 
+        Thread thread1;
+        Thread thread2;
+        Thread thread3;
+        Thread thread4;
+
+
         CardReader CardReader = new CardReader();
         LogInfo logInfo = new LogInfo();
 
@@ -52,7 +58,7 @@ namespace FotoCardReader
                         case "checkBox1":
                             CardReader disk1 = new CardReader(c.Text, txtDestinationFolder.Text);
                             disk1.ObjNo = 1;
-                            Thread thread1 = new Thread(() => CopyFiles(disk1));
+                            thread1 = new Thread(() => CopyFiles(disk1));
                             thread1.Start();
                             thread1.IsBackground = true;
                             break;
@@ -60,7 +66,7 @@ namespace FotoCardReader
                         case "checkBox2":
                             CardReader disk2 = new CardReader(c.Text, txtDestinationFolder.Text);
                             disk2.ObjNo = 2;
-                            Thread thread2 = new Thread(() => CopyFiles(disk2));
+                            thread2 = new Thread(() => CopyFiles(disk2));
                             thread2.Start();
                             thread2.IsBackground = true;
                             break;
@@ -68,7 +74,7 @@ namespace FotoCardReader
                         case "checkBox3":
                             CardReader disk3 = new CardReader(c.Text, txtDestinationFolder.Text);
                             disk3.ObjNo = 3;
-                            Thread thread3 = new Thread(() => CopyFiles(disk3));
+                            thread3 = new Thread(() => CopyFiles(disk3));
                             thread3.Start();
                             thread3.IsBackground = true;
                             break;
@@ -76,47 +82,15 @@ namespace FotoCardReader
                         case "checkBox4":
                             CardReader disk4 = new CardReader(c.Text, txtDestinationFolder.Text);
                             disk4.ObjNo = 4;
-                            Thread thread4 = new Thread(() => CopyFiles(disk4));
+                            thread4 = new Thread(() => CopyFiles(disk4));
                             thread4.Start();
                             thread4.IsBackground = true;
                             break;
 
                     }
-                    /*
-                    if (c.Name == "checkBox1") {
-                        CardReader disk1 = new CardReader(c.Text, txtDestinationFolder.Text);
-                        disk1.ObjNo = 1;
-                        Thread thread1 = new Thread(() => CopyFiles(disk1));
-                        thread1.Start();
-                        thread1.IsBackground = true;
-                    }
-                    if (c.Name == "checkBox2")
-                    {                    
-                        CardReader disk2 = new CardReader(c.Text, txtDestinationFolder.Text);
-                        disk2.ObjNo = 2;
-                        Thread thread2 = new Thread(() => CopyFiles(disk2));
-                        thread2.Start();
-                        thread2.IsBackground = true;
-                    }
-                    if (c.Name == "checkBox3")
-                    {
-                        CardReader disk3 = new CardReader(c.Text, txtDestinationFolder.Text);
-                        disk3.ObjNo = 3;
-                        Thread thread3 = new Thread(() => CopyFiles(disk3));
-                        thread3.Start();
-                        thread3.IsBackground = true;
-                    }
-                    if (c.Name == "checkBox4")
-                    {
-                        CardReader disk4 = new CardReader(c.Text, txtDestinationFolder.Text);
-                        disk4.ObjNo = 4;
-                        Thread thread4 = new Thread(() => CopyFiles(disk4));
-                        thread4.Start();
-                        thread4.IsBackground = true;
-                    }
-                    */
-                    
+
                     logInfo.AddResultInfo(txtResultInfo, "Copy " + c.Text + " index="  + c.Name);
+                    RunProcessMonitor();
                     
                 }
             }
@@ -206,6 +180,56 @@ namespace FotoCardReader
             }
             CheckEnableCopyBtn();
         }
+        
+        private void VisibleButtons(bool state)
+        {
+            cmdScanCards.Invoke(new Action(delegate ()
+            {
+                cmdScanCards.Enabled = state;
+            }));
+
+            OpenFolderDestDialog.Invoke(new Action(delegate ()
+            {
+                OpenFolderDestDialog.Enabled = state;
+            }));
+
+            cmdCopy.Invoke(new Action(delegate ()
+            {
+                cmdCopy.Enabled = state;
+            }));
+        }
+
+        private void ProcessMonitor()
+        {
+            bool loopRun = true;
+            while (loopRun)
+            {
+
+                if ((thread1 != null && thread1.IsAlive) ||
+                                    (thread2 != null && thread2.IsAlive) ||
+                                    (thread3 != null && thread3.IsAlive) ||
+                                    (thread4 != null && thread4.IsAlive))
+                {
+                    loopRun = true;
+                }
+                else
+                {
+                    loopRun = false;
+                }
+
+                VisibleButtons(false);
+            }
+
+            VisibleButtons(true);
+        }
+
+        private void RunProcessMonitor()
+        {
+            Thread thMonitor = new Thread(ProcessMonitor);
+            thMonitor.Start();
+            thMonitor.IsBackground = true;
+        }
+        
         #endregion Methods
 
         #region Events
