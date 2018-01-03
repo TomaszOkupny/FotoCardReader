@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
@@ -43,6 +41,8 @@ namespace FotoCardReader
                 checkBox.Text = labelText;
             }
         }
+
+
 
 
         protected void PrepareCopy()
@@ -242,12 +242,12 @@ namespace FotoCardReader
         {
             FolderBrowserDialog folderBrowserDlg = new FolderBrowserDialog();
             folderBrowserDlg.Description = "Wybierz folder docelowy";
+            folderBrowserDlg.SelectedPath = Reg.LastDirectory;
             if (folderBrowserDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 txtDestinationFolder.Text = folderBrowserDlg.SelectedPath;
-                //CardReader.DestDir = folderBrowserDlg.SelectedPath;
+                Reg.LastDirectory = folderBrowserDlg.SelectedPath;
                 CheckEnableCopyBtn();
-
             }
         }
 
